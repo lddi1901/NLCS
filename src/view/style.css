@@ -1,0 +1,103 @@
+/* Đặt font chữ và căn chỉnh tổng thể */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Tiêu đề */
+h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+/* Thanh công cụ */
+.toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 15px;
+}
+
+/* Nút nhập/xuất file */
+#importBtn,
+#exportBtn {
+    padding: 10px 15px;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #e6460b;
+    color: white;
+    transition: 0.3s;
+    margin: 0 5px;
+}
+
+#importBtn:hover,
+#exportBtn:hover {
+    background-color: #0056b3;
+}
+
+/* Select chế độ */
+label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #555;
+    margin: 0 10px;
+}
+
+select {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Khung chứa canvas */
+.canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: fit-content;
+    margin: 0 auto;
+}
+
+/* Canvas */
+canvas {
+    border: 1px solid #ccc;
+    background: white;
+    display: block;
+}
+
+/* Nút chung */
+button {
+    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
