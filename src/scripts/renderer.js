@@ -19,12 +19,12 @@ canvas.addEventListener("mousedown", async (event) => {
     let clickedNode = getNodeAt(x, y);
     let clickedEdge = getEdgeAt(x, y);
 
-    if (modeSelector.value === "drawNode") {
+    if (getCurrentMode() === "drawNode") {
         if (clickedNode) {
             selectedNode = clickedNode;
             isDraggingNode = true;
         } else {
-            if (modeSelector.value === "drawNode") {
+            if (getCurrentMode() === "drawNode") {
     if (clickedNode) {
         selectedNode = clickedNode;
         isDraggingNode = true;
@@ -55,7 +55,7 @@ canvas.addEventListener("mousedown", async (event) => {
         }
     }
 
-    if (modeSelector.value === "drawEdge") {
+    if (getCurrentMode() === "drawEdge") {
         if (clickedNode) {
             selectedNode = clickedNode;
             isDrawingEdge = true;
@@ -63,18 +63,18 @@ canvas.addEventListener("mousedown", async (event) => {
         }
     }
 
-    if (modeSelector.value === "deleteNode" && clickedNode) {
+    if (getCurrentMode()=== "deleteNode" && clickedNode) {
         deleteNode(clickedNode);
         drawGraph();
     }
 
-    if (modeSelector.value === "deleteEdge" && clickedEdge) {
+   if (getCurrentMode() === "deleteEdge" && clickedEdge) {
         deleteEdge(clickedEdge);
         drawGraph();
     }
 
     // 📌 Chỉnh sửa trọng số cạnh
-    if (modeSelector.value === "editWeight" && clickedEdge) {
+    if (getCurrentMode() === "editWeight" && clickedEdge) {
         const { value: newWeight } = await Swal.fire({
             title: "Chỉnh sửa trọng số",
             input: "number",
@@ -355,3 +355,33 @@ function exportGraph() {
     a.download = "graph.txt";
     a.click();
 }
+canvas.addEventListener("mousedown", (event) => {
+    const mode = getCurrentMode();
+    
+    if (mode === "drawNode") {
+        canvas.style.cursor = "crosshair";
+    } else if (mode === "drawEdge") {
+        canvas.style.cursor = "pointer";
+    } else if (mode === "deleteNode" || mode === "deleteEdge") {
+        canvas.style.cursor = "not-allowed";
+    } else {
+        canvas.style.cursor = "default";
+    }
+
+    // Đảm bảo cập nhật lại font chữ khi vẽ lên canvas
+    const ctx = canvas.getContext("2d");
+    ctx.font = "16px Arial"; // Đảm bảo font chữ nhất quán
+});
+
+canvas.addEventListener("mouseup", () => {
+    canvas.style.cursor = "default";
+});
+
+document.querySelectorAll(".mode-btn").forEach(button => {
+    button.addEventListener("click", () => {
+        document.querySelectorAll(".mode-btn").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        currentMode = button.getAttribute("data-mode");
+        document.getElementById("modeIndicator").innerText = `Chế độ: ${button.innerText}`;
+    });
+});
