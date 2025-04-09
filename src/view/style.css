@@ -1,9 +1,18 @@
 /* Đặt font chữ và căn chỉnh tổng thể */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     text-align: center;
-    background-color: #f4f4f4;
+    background-color: #f0f0f0;
     margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
     padding: 20px;
 }
 
@@ -11,23 +20,41 @@ body {
 h1 {
     font-size: 28px;
     color: #333;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     text-transform: uppercase;
 }
 
 /* Thanh công cụ */
 .toolbar {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 15px;
-    /* Tăng khoảng cách giữa các nút */
+    gap: 20px;
+    margin-bottom: 20px;
     padding: 12px;
     background: #ffffff;
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     width: fit-content;
     margin: 0 auto 15px;
+}
+
+.toolbar-group {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.file-operations, .algorithm-operations {
+    flex: 1;
+    min-width: 200px;
+}
+
+.graph-operations {
+    flex: 2;
+    min-width: 400px;
 }
 
 /* Nhãn chế độ */
@@ -40,35 +67,80 @@ h1 {
 
 /* Nút chung */
 button {
-    padding: 12px 18px;
-    /* Làm cho nút to hơn */
-    font-size: 16px;
+    padding: 10px 15px;
+    font-size: 14px;
     font-weight: bold;
     color: white;
-    background-color: #007bff;
+    background-color: #4CAF50;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s ease-in-out, transform 0.2s;
+    transition: background-color 0.3s;
 }
 
 /* Hiệu ứng hover */
 button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-    /* Hiệu ứng phóng to nhẹ */
+    background-color: #45a049;
 }
 
-/* Nhập/Xuất file - Đồng bộ với các nút khác */
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.mode-btn, .algo-btn {
+    background-color: #008CBA;
+}
+
+.mode-btn:hover, .algo-btn:hover {
+    background-color: #007B9A;
+}
+
+.mode-btn.active, .algo-btn.active {
+    background-color: #005f73;
+}
+
+#modeIndicator {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
 #importBtn,
 #exportBtn {
-    background-color: #ff5722;
-    /* Màu cam đậm */
+    background-color: #ff9800;
 }
 
 #importBtn:hover,
 #exportBtn:hover {
-    background-color: #e64a19;
+    background-color: #e68a00;
+}
+
+#resetGraph {
+    background-color: #f44336;
+}
+
+#resetGraph:hover {
+    background-color: #da190b;
+}
+
+#startAlgorithm {
+    background-color: #9c27b0;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#startAlgorithm:hover {
+    background-color: #7B1FA2;
+}
+
+.algorithm-section {
+    display: flex;
+    justify-content: space-between;
+}
+
+.algorithm-section button {
+    flex: 1;
+    margin: 0 5px;
 }
 
 /* Khung chứa canvas */
@@ -82,11 +154,13 @@ button:hover {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     width: fit-content;
     margin: 0 auto;
+    text-align: center;
 }
 
 /* Canvas */
 canvas {
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
+    border-radius: 5px;
     background: white;
     display: block;
 }

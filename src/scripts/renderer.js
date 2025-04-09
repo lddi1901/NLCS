@@ -10,6 +10,7 @@ let isDraggingNode = false;
 let isDrawingEdge = false;
 let selectedNode = null;
 let tempEdge = null;
+let mstEdges = null; // Sẽ chứa các cạnh của cây khung tối thiểu
 
 const NODE_RADIUS = 25;
 
@@ -24,34 +25,25 @@ canvas.addEventListener("mousedown", async (event) => {
             selectedNode = clickedNode;
             isDraggingNode = true;
         } else {
-            if (getCurrentMode() === "drawNode") {
-    if (clickedNode) {
-        selectedNode = clickedNode;
-        isDraggingNode = true;
-    } else {
-        const { value: nodeName } = await Swal.fire({
-            title: "Nhập tên đỉnh",
-            input: "text",
-            inputAttributes: { maxlength: 2 },
-            showCancelButton: true,
-            confirmButtonText: "OK",
-            cancelButtonText: "Hủy",
-            preConfirm: (name) => {
-                if (!/^(?:[A-Z]|[1-9][0-9]?)$/.test(name)) {
-                    Swal.showValidationMessage("Chỉ chấp nhận chữ cái A-Z hoặc số từ 1-99!");
+            const { value: nodeName } = await Swal.fire({
+                title: "Nhập tên đỉnh",
+                input: "text",
+                inputAttributes: { maxlength: 2 },
+                showCancelButton: true,
+                confirmButtonText: "OK",
+                cancelButtonText: "Hủy",
+                preConfirm: (name) => {
+                    if (!/^(?:[A-Z]|[1-9][0-9]?)$/.test(name)) {
+                        Swal.showValidationMessage("Chỉ chấp nhận chữ cái A-Z hoặc số từ 1-99!");
+                    }
+                    return name;
                 }
-                return name;
+            });
+
+            if (nodeName) {
+                nodes.push({ x, y, id: nodeName });
+                drawGraph();
             }
-        });
-
-        if (nodeName) {
-            nodes.push({ x, y, id: nodeName });
-            drawGraph();
-        }
-    }
-}
-
-            drawGraph();
         }
     }
 
@@ -219,18 +211,28 @@ function deleteEdge(edge) {
 function drawGraph() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    edges.forEach(drawEdge);
+    // Vẽ tất cả các cạnh
+    edges.forEach(edge => {
+        drawEdge(edge, "gray"); // Vẽ các cạnh không thuộc MST bằng màu xám
+    });
+
+    // Vẽ các cạnh thuộc MST (nếu có)
+    if (mstEdges) {
+        mstEdges.forEach(edge => {
+            drawEdge(edge, "red"); // Vẽ các cạnh thuộc MST bằng màu đỏ
+        });
+    }
+
+    // Vẽ các đỉnh
     nodes.forEach(drawNode);
 
+    // Vẽ cạnh tạm thời (nếu đang vẽ cạnh)
     if (tempEdge) {
-        ctx.setLineDash([5, 5]);
         ctx.beginPath();
         ctx.moveTo(tempEdge.x1, tempEdge.y1);
         ctx.lineTo(tempEdge.x2, tempEdge.y2);
         ctx.strokeStyle = "gray";
-        ctx.lineWidth = 2;
         ctx.stroke();
-        ctx.setLineDash([]);
     }
 }
 
@@ -250,29 +252,19 @@ function drawNode(node) {
 }
 
 // 📌 Hàm vẽ cạnh cong
-function drawEdge(edge) {
+function drawEdge(edge, color) {
     ctx.beginPath();
-
-    const { start, end, weight, curveOffset } = edge;
-    const midX = (start.x + end.x) / 2;
-    const midY = (start.y + end.y) / 2;
-    const dx = end.x - start.x;
-    const dy = end.y - start.y;
-    const normalX = -dy;
-    const normalY = dx;
-    const length = Math.hypot(normalX, normalY);
-    const curveX = midX + (normalX / length) * curveOffset;
-    const curveY = midY + (normalY / length) * curveOffset;
-
-    ctx.moveTo(start.x, start.y);
-    ctx.quadraticCurveTo(curveX, curveY, end.x, end.y);
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
+    ctx.moveTo(edge.start.x, edge.start.y);
+    ctx.lineTo(edge.end.x, edge.end.y);
+    ctx.strokeStyle = color;
     ctx.stroke();
 
-    ctx.fillStyle = "red";
+    // Vẽ trọng số
+    const midX = (edge.start.x + edge.end.x) / 2;
+    const midY = (edge.start.y + edge.end.y) / 2;
+    ctx.fillStyle = "black";
     ctx.font = "bold 14px Arial";
-    ctx.fillText(weight, curveX, curveY);
+    ctx.fillText(edge.weight.toString(), midX, midY);
 }
 document.addEventListener("DOMContentLoaded", () => {
     const resetButton = document.getElementById("resetGraph");
@@ -281,6 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
         resetButton.addEventListener("click", () => {
             nodes = [];
             edges = [];
+            mstEdges = []; // Xóa các cạnh của MST
             drawGraph();
         });
     }
@@ -385,3 +378,155 @@ document.querySelectorAll(".mode-btn").forEach(button => {
         document.getElementById("modeIndicator").innerText = `Chế độ: ${button.innerText}`;
     });
 });
+
+let currentAlgorithm = "";
+
+// Xử lý sự kiện cho các nút thuật toán
+document.querySelectorAll(".algo-btn").forEach(button => {
+    button.addEventListener("click", () => {
+        document.querySelectorAll(".algo-btn").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        currentAlgorithm = button.getAttribute("data-algo");
+        document.getElementById("startAlgorithm").disabled = false;
+    });
+});
+
+// Xử lý sự kiện cho nút bắt đầu thuật toán
+document.getElementById("startAlgorithm").addEventListener("click", () => {
+    if (currentAlgorithm === "kruskal") {
+        runKruskal();
+    } else if (currentAlgorithm === "prim") {
+        runPrim();
+    }
+    // Thêm các thuật toán khác nếu cần
+});
+
+// Hàm thực hiện thuật toán Prim
+function runPrim() {
+    console.log("Bắt đầu chạy thuật toán Prim");
+    mstEdges = primMST(nodes, edges);
+    if (mstEdges.length > 0) {
+        console.log("Tìm thấy cây khung nhỏ nhất với", mstEdges.length, "cạnh");
+        // Vẽ lại đồ thị với các cạnh MST màu đỏ
+        drawGraph();
+    } else {
+        console.log("Không tìm thấy cây khung nhỏ nhất hoặc đồ thị không liên thông");
+    }
+}
+
+// Hàm thực hiện thuật toán Kruskal
+function runKruskal() {
+    // Implement thuật toán Kruskal
+    mstEdges = kruskalMST(nodes, edges);
+    drawGraph();
+}
+
+// Hàm tìm đại diện của một tập hợp (sử dụng trong Kruskal)
+function find(parent, i) {
+    if (parent[i] === i) {
+        return i;
+    }
+    return find(parent, parent[i]);
+}
+
+// Hàm hợp nhất hai tập hợp (sử dụng trong Kruskal)
+function union(parent, rank, x, y) {
+    let xroot = find(parent, x);
+    let yroot = find(parent, y);
+
+    if (rank[xroot] < rank[yroot]) {
+        parent[xroot] = yroot;
+    } else if (rank[xroot] > rank[yroot]) {
+        parent[yroot] = xroot;
+    } else {
+        parent[yroot] = xroot;
+        rank[xroot]++;
+    }
+}
+
+// Thuật toán Kruskal
+function kruskalMST(nodes, edges) {
+    let result = [];
+    let i = 0;
+    let e = 0;
+    edges.sort((a, b) => a.weight - b.weight);
+
+    let parent = {};
+    let rank = {};
+
+    nodes.forEach(node => {
+        parent[node.id] = node.id;
+        rank[node.id] = 0;
+    });
+
+    while (e < nodes.length - 1 && i < edges.length) {
+        let edge = edges[i++];
+        let x = find(parent, edge.start.id);
+        let y = find(parent, edge.end.id);
+
+        if (x !== y) {
+            e++;
+            result.push(edge);
+            union(parent, rank, x, y);
+        }
+    }
+
+    return result;
+}
+
+// Thuật toán Prim
+function primMST(nodes, edges) {
+    console.log("Bắt đầu thuật toán Prim");
+    console.log("Số lượng đỉnh:", nodes.length);
+    console.log("Số lượng cạnh:", edges.length);
+
+    let result = [];
+    let included = new Set();
+    let adjacencyList = {};
+
+    // Tạo danh sách kề
+    nodes.forEach(node => {
+        adjacencyList[node.id] = [];
+    });
+    edges.forEach(edge => {
+        adjacencyList[edge.start.id].push({node: edge.end, weight: edge.weight, originalEdge: edge});
+        adjacencyList[edge.end.id].push({node: edge.start, weight: edge.weight, originalEdge: edge});
+    });
+
+    console.log("Danh sách kề:", adjacencyList);
+
+    // Bắt đầu từ nút đầu tiên
+    if (nodes.length > 0) {
+        included.add(nodes[0].id);
+        console.log("Bắt đầu từ đỉnh:", nodes[0].id);
+    } else {
+        console.log("Không có đỉnh nào trong đồ thị");
+        return result;
+    }
+
+    while (included.size < nodes.length) {
+        let minEdge = null;
+        let minWeight = Infinity;
+
+        included.forEach(nodeId => {
+            adjacencyList[nodeId].forEach(neighbor => {
+                if (!included.has(neighbor.node.id) && neighbor.weight < minWeight) {
+                    minEdge = neighbor.originalEdge;
+                    minWeight = neighbor.weight;
+                }
+            });
+        });
+
+        if (minEdge) {
+            console.log("Thêm cạnh:", minEdge.start.id, "->", minEdge.end.id, "với trọng số", minEdge.weight);
+            result.push(minEdge);
+            included.add(included.has(minEdge.start.id) ? minEdge.end.id : minEdge.start.id);
+        } else {
+            console.log("Không tìm thấy cạnh phù hợp. Đồ thị có thể không liên thông.");
+            break;
+        }
+    }
+
+    console.log("Kết quả Prim:", result);
+    return result;
+}

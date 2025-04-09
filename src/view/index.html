@@ -13,19 +13,30 @@
         <h1>ỨNG DỤNG TÌM CÂY KHUNG TỐI THIỂU (MST)</h1>
 
         <div class="toolbar">
-            <input type="file" id="fileInput" style="display: none">
-            <button id="importBtn" onclick="importGraph()">📂 Nhập file</button>
+            <div class="toolbar-group file-operations">
+                <input type="file" id="fileInput" style="display: none">
+                <button id="importBtn" onclick="importGraph()">📂 Nhập file</button>
+                <button id="exportBtn" onclick="exportGraph()">💾 Xuất file</button>
+            </div>
 
-            <div id="modeIndicator">Chế độ: Chưa chọn</div>
-            <button class="mode-btn" data-mode="drawNode">Thêm đỉnh</button>
-            <button class="mode-btn" data-mode="drawEdge">Vẽ cạnh</button>
-            <button class="mode-btn" data-mode="editWeight">Chỉnh sửa trọng số</button>
-            <button class="mode-btn" data-mode="deleteNode">Xóa đỉnh</button>
-            <button class="mode-btn" data-mode="deleteEdge">Xóa cạnh</button>
-            
+            <div class="toolbar-group graph-operations">
+                <div id="modeIndicator">Chế độ: Chưa chọn</div>
+                <button class="mode-btn" data-mode="drawNode">Thêm đỉnh</button>
+                <button class="mode-btn" data-mode="drawEdge">Vẽ cạnh</button>
+                <button class="mode-btn" data-mode="editWeight">Chỉnh sửa trọng số</button>
+                <button class="mode-btn" data-mode="deleteNode">Xóa đỉnh</button>
+                <button class="mode-btn" data-mode="deleteEdge">Xóa cạnh</button>
+                <button id="resetGraph">🔄 Reset</button>
+            </div>
 
-            <button id="resetGraph">🔄 Reset</button>
-            <button id="exportBtn" onclick="exportGraph()">💾 Xuất file</button>
+            <div class="toolbar-group algorithm-operations">
+                <div class="algorithm-section">
+                    <button class="algo-btn" data-algo="kruskal">Kruskal</button>
+                    <button class="algo-btn" data-algo="prim">Prim</button>
+                    <!-- Thêm các thuật toán khác nếu cần -->
+                </div>
+                <button id="startAlgorithm" disabled>Bắt đầu thuật toán</button>
+            </div>
         </div>
 
         <div class="canvas-container">
