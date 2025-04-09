@@ -7,6 +7,19 @@ body {
     padding: 20px;
 }
 
+#undoBtn {
+    background-color: #795548;
+}
+
+#undoBtn:hover {
+    background-color: #5D4037;
+}
+
+#undoBtn:disabled {
+    background-color: #D7CCC8;
+    cursor: not-allowed;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
