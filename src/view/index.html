@@ -4,19 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ứng dụng tìm cây khung tối thiểu (MST)</title>
+    <title>Ứng dụng tìm cây khung tối tiểu (MST)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <div class="container">
-        <h1>ỨNG DỤNG TÌM CÂY KHUNG TỐI THIỂU (MST)</h1>
+        <h1>ỨNG DỤNG TÌM CÂY KHUNG TỐI TIỂU (MST)</h1>
 
         <div class="toolbar">
             <div class="toolbar-group file-operations">
                 <input type="file" id="fileInput" style="display: none">
                 <button id="importBtn" onclick="importGraph()">📂 Nhập file</button>
                 <button id="exportBtn" onclick="exportGraph()">💾 Xuất file</button>
+                <div class="file-preview">
+                    <h3>Nội dung file:</h3>
+                    <pre id="fileContent"></pre>
+                </div>
             </div>
 
             <div class="toolbar-group graph-operations">

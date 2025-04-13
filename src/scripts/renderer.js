@@ -253,18 +253,48 @@ function drawNode(node) {
 
 // 📌 Hàm vẽ cạnh cong
 function drawEdge(edge, color) {
+    const { start, end, weight, curveOffset } = edge;
     ctx.beginPath();
-    ctx.moveTo(edge.start.x, edge.start.y);
-    ctx.lineTo(edge.end.x, edge.end.y);
-    ctx.strokeStyle = color;
-    ctx.stroke();
+    
+    if (curveOffset !== 0) {
+        // Vẽ đường cong
+        const midX = (start.x + end.x) / 2;
+        const midY = (start.y + end.y) / 2;
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const normalX = -dy;
+        const normalY = dx;
+        const length = Math.sqrt(normalX * normalX + normalY * normalY);
+        const unitX = normalX / length;
+        const unitY = normalY / length;
+        const curveX = midX + unitX * curveOffset;
+        const curveY = midY + unitY * curveOffset;
 
-    // Vẽ trọng số
-    const midX = (edge.start.x + edge.end.x) / 2;
-    const midY = (edge.start.y + edge.end.y) / 2;
-    ctx.fillStyle = "black";
-    ctx.font = "bold 14px Arial";
-    ctx.fillText(edge.weight.toString(), midX, midY);
+        ctx.moveTo(start.x, start.y);
+        ctx.quadraticCurveTo(curveX, curveY, end.x, end.y);
+
+        // Vẽ trọng số
+        const textX = (start.x + end.x + curveOffset * unitX) / 2;
+        const textY = (start.y + end.y + curveOffset * unitY) / 2;
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        ctx.fillStyle = "black";
+        ctx.font = "bold 14px Arial";
+        ctx.fillText(weight.toString(), textX, textY);
+    } else {
+        // Vẽ đường thẳng
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+
+        // Vẽ trọng số
+        const textX = (start.x + end.x) / 2;
+        const textY = (start.y + end.y) / 2;
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        ctx.fillStyle = "black";
+        ctx.font = "bold 14px Arial";
+        ctx.fillText(weight.toString(), textX, textY);
+    }
 }
 document.addEventListener("DOMContentLoaded", () => {
     const resetButton = document.getElementById("resetGraph");
@@ -275,6 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
             edges = [];
             mstEdges = []; // Xóa các cạnh của MST
             drawGraph();
+            clearFileContent(); // Thêm dòng này
         });
     }
 });
@@ -291,19 +322,27 @@ function importGraph() {
 
         const reader = new FileReader();
         reader.onload = (e) => {
+            clearFileContent(); // Thêm dòng này
             const content = e.target.result;
+            updateFileContentDisplay(content);
             parseGraphData(content);
             fileInput.value = ""; // Reset để có thể nhập lại cùng file
         };
         reader.readAsText(file);
     };
 }
-
+function clearFileContent() {
+    document.getElementById("fileContent").textContent = "";
+}
+function updateFileContentDisplay(content) {
+    document.getElementById("fileContent").textContent = content;
+}
 
 function parseGraphData(content) {
     nodes = [];
     edges = [];
-    const nodeMap = new Map(); 
+    const nodeMap = new Map();
+    const edgeMap = new Map(); // Để theo dõi các cạnh giữa các cặp đỉnh
 
     const lines = content.split("\n").map(line => line.trim()).filter(line => line);
 
@@ -322,18 +361,31 @@ function parseGraphData(content) {
             nodeMap.set(endId, { id: endId, x: Math.random() * 600 + 50, y: Math.random() * 400 + 50 });
         }
 
-        edges.push({ 
-            start: nodeMap.get(startId), 
-            end: nodeMap.get(endId), 
-            weight, 
-            curveOffset: 0 
-        });
+        const start = nodeMap.get(startId);
+        const end = nodeMap.get(endId);
+
+        // Tạo một khóa duy nhất cho cặp đỉnh này
+        const edgeKey = startId < endId ? `${startId}-${endId}` : `${endId}-${startId}`;
+
+        // Kiểm tra xem đã có cạnh nào giữa hai đỉnh này chưa
+        if (!edgeMap.has(edgeKey)) {
+            edgeMap.set(edgeKey, []);
+        }
+
+        // Tính toán curveOffset dựa trên số lượng cạnh hiện có
+        const existingEdges = edgeMap.get(edgeKey);
+        const curveOffset = existingEdges.length > 0 ? 
+            (existingEdges.length + 1) * 35 * (existingEdges.length % 2 === 0 ? 1 : -1) : 0;
+
+        // Thêm cạnh mới vào danh sách
+        const newEdge = { start, end, weight, curveOffset };
+        existingEdges.push(newEdge);
+        edges.push(newEdge);
     });
 
     nodes = Array.from(nodeMap.values());
     drawGraph();
 }
-
 
 // 📌 Hàm xuất file
 function exportGraph() {

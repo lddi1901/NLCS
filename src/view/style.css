@@ -7,6 +7,33 @@ body {
     padding: 20px;
 }
 
+.file-preview {
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    max-width: 500px;
+}
+
+.file-preview h3 {
+    margin-top: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+#fileContent {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: #ffffff;
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
 #undoBtn {
     background-color: #795548;
 }
@@ -60,7 +87,19 @@ h1 {
     padding: 10px;
 }
 
-.file-operations, .algorithm-operations {
+.file-operations {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.file-operations button {
+    margin-bottom: 10px;
+}
+
+.algorithm-operations {
     flex: 1;
     min-width: 200px;
 }
