@@ -3,18 +3,40 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "nodemon --exec electron ."
+    "start": "nodemon --exec electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Ứng dụng tìm cây khung tối tiểu (MST)",
   "devDependencies": {
     "electron": "^35.0.2",
-    "nodemon": "^3.1.9"
+    "electron-builder": "^24.6.4"
   },
   "dependencies": {
-    "save-dev": "^0.0.1-security",
     "sweetalert2": "^11.6.13"
+  },
+  "build": {
+    "appId": "com.yourcompany.mstgraph",
+    "productName": "MST Graph",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }

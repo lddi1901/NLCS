@@ -461,6 +461,7 @@ function runPrim() {
         console.log("Tìm thấy cây khung nhỏ nhất với", mstEdges.length, "cạnh");
         // Vẽ lại đồ thị với các cạnh MST màu đỏ
         drawGraph();
+        updateMSTWeight(mstEdges);
     } else {
         console.log("Không tìm thấy cây khung nhỏ nhất hoặc đồ thị không liên thông");
     }
@@ -468,9 +469,9 @@ function runPrim() {
 
 // Hàm thực hiện thuật toán Kruskal
 function runKruskal() {
-    // Implement thuật toán Kruskal
     mstEdges = kruskalMST(nodes, edges);
     drawGraph();
+    updateMSTWeight(mstEdges);
 }
 
 // Hàm tìm đại diện của một tập hợp (sử dụng trong Kruskal)
@@ -581,4 +582,9 @@ function primMST(nodes, edges) {
 
     console.log("Kết quả Prim:", result);
     return result;
+}
+
+function updateMSTWeight(mstEdges) {
+    const totalWeight = mstEdges.reduce((sum, edge) => sum + edge.weight, 0);
+    document.getElementById('mstWeight').textContent = totalWeight;
 }
